@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+
+    <script>
+        function postText() {
+            var text = document.getElementById("text");
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("id").innerHTML = xhttp.responseText;
+                }
+            };
+            xhttp.open("POST", "https://n00y0p09gh.execute-api.us-east-1.amazonaws.com/dev", false);
+            xhttp.send(text.value);
+        }
+        function listTexts() {
+            var element = document.getElementById("list");
+            element.innerHTML = '';
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var list = JSON.parse(xhttp.responseText);
+                    list.Items.map((item) => {
+                        if (item.status && item.text) {
+                            var tr = document.createElement("tr");
+                            tr.innerHTML = "<td>" + item.id + "</td>"
+                                + "<td>" + item.text + "</td>"
+                                + "<td>" + item.date + "</td>"
+                                + "<td>" + item.status + "</td>"
+                                + '<td><audio controls><source src="https://s3.amazonaws.com/aseigneurin-ipponusa/text-to-speech/audio/' + item.id + '.mp3" type="audio/ogg"></audio></td>'
+                            element.appendChild(tr);
+                        }
+                    });
+                }
+            };
+            xhttp.open("GET", "https://n00y0p09gh.execute-api.us-east-1.amazonaws.com/dev", false);
+            xhttp.send();
+        }
+        function appendColumn(tr, text) {
+            var td = document.createElement("td");
+            td.appendChild(document.createTextNode(text));
+            tr.appendChild(td);
+        }
+    </script>
+
+    <title>AWS Sandbox</title>
+</head>
+
+<body class="bg-light">
+    <div class="container">
+        <div class="py-5 text-center">
+            <h1>AWS Sandbox</h1>
+            <p class="lead">Submit a text, it will be sent to Lambda, stored in DynamoDB, converted to speech with Polly, the audio file
+                will be stored in S3, and you can then download that file.</p>
+        </div>
+
+        <h1>Submit text to convert</h1>
+        <fieldset>
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="text">Text to translate</label>
+                    <textarea id="text"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <button type="button" class="btn btn-primary btn-block btn-lg" onclick="postText()">Submit</button>
+            </div>
+            <div class="row">
+                <p id="id"></p>
+            </div>
+        </fieldset>
+
+        <h1>List</h1>
+        <div class="row">
+            <button type="button" class="btn btn-primary" onclick="listTexts()">List</button>
+        </div>
+        <div class="row">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Text</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Sound</th>
+                    </tr>
+                </thead>
+                <tbody id="list">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
